@@ -11,7 +11,7 @@ class TranscribeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,7 @@ class TranscribeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'audio' => 'required|file|mimes:flac,mp3,mp4,mpeg,mpga,m4a,ogg,opus,wav,webm|max:10240', // max size 10MB
         ];
     }
 }
