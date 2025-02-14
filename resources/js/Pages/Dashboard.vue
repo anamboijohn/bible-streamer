@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import Button from '@/Components/ui/button/Button.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
+import { Mic } from 'lucide-vue-next';
 </script>
 
 <template>
@@ -14,11 +16,23 @@ import { Head } from '@inertiajs/vue3';
         </template>
 
         <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <div class="grid grid-rows-2 justify-between">
-                        <div class="p-6 text-gray-900">You're logged in!</div>
-                        <div></div>
+            <div class="mx-auto grid grid-flow-row grid-rows-2 gap-6">
+                <div>
+                    <p class="text-center">
+                        Lorem, ipsum dolor sit amet consectetur adipisicing
+                        elit. Id at commodi accusantium, consectetur nulla
+                        soluta, vero aspernatur quae debitis, minima modi ipsa
+                        iure! Facilis libero optio quidem, ab numquam impedit.
+                    </p>
+                </div>
+                <div
+                    class="flex flex-col justify-between overflow-hidden bg-white py-10 shadow-sm sm:rounded-lg"
+                >
+                    <div class="p-6 text-center text-gray-900">
+                        You're logged in!
+                    </div>
+                    <div class="mx-auto">
+                        <Button> <Mic /> Start Listening </Button>
                     </div>
                 </div>
             </div>
