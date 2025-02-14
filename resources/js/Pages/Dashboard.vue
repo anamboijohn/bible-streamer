@@ -18,9 +18,7 @@ import { Head } from '@inertiajs/vue3';
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="grid grid-rows-2 justify-between">
                         <div class="p-6 text-gray-900">You're logged in!</div>
-                        <div>
-                            <button>Start listening</button>
-                        </div>
+                        <div></div>
                     </div>
                 </div>
             </div>

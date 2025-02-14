@@ -23,7 +23,7 @@ defineProps<{
                 <p class="my-4 text-lg font-semibold">
                     Get live display of scriptural references
                 </p>
-                <div class="grid grid-cols-2 gap-5"> 
+                <div class="grid grid-cols-2 gap-5">
                     <Link
                         :href="route('login')"
                         class="rounded-xl bg-black px-3 py-2 text-white"
