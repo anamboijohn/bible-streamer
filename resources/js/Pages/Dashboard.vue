@@ -1,57 +1,49 @@
 <script setup lang="ts">
 import Button from '@/Components/ui/button/Button.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import { Mic } from 'lucide-vue-next';
 import { onUnmounted, ref } from 'vue';
+
 const URL = window.URL || window.webkitURL;
-
-// Initialize the Groq client
-// const groq = new Groq();
-
-// Function to send an audio blob to Groq API for transcription
-async function transcribeAudioBlob(audioBlob: Blob) {
-    const form = useForm({
-        audio: audioBlob,
-    });
-    const response = await form.post(route('transcribe.show'), {
-        onSuccess: (res) => {
-            // Handle successful response
-            console.log(res);
-        },
-        onError: (error) => {
-            // Handle errors
-            console.error(error);
-        },
-        preserveScroll: true,
-        forceFormData: true,
-    });
-
-    return response;
-}
-
-// Set up live audio capture and transcription
-let mediaRecorder: MediaRecorder | null = null;
 const isRecording = ref(false);
+const audio = ref<Blob | null>(null);
+const transcripts = ref<string[]>([]);
+let mediaRecorder: MediaRecorder | null = null;
+let socket: WebSocket | null = null;
 
-let audio = ref<Blob | null>(null);
+const GROQ_URL = 'wss://api.deepgram.com/v1/listen?language=en';
+const GROQ_KEY = '6dc15e174972ce916c930e5d4ec25006b249fc34';
 
-function startAudioTranscription() {
-    navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then((stream) => {
-            mediaRecorder = new MediaRecorder(stream);
-            mediaRecorder.ondataavailable = async (event) => {
-                audio.value = event.data;
-                console.log(event.data);
-                await transcribeAudioBlob(event.data);
-            };
-            mediaRecorder.start(5000);
-            isRecording.value = true;
-        })
-        .catch((err) => {
-            console.error('Error accessing microphone:', err);
+async function startAudioTranscription() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
         });
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+
+        socket = new WebSocket(GROQ_URL, ['token', GROQ_KEY]);
+        socket.onopen = () => {
+            mediaRecorder?.start(250);
+            mediaRecorder?.addEventListener('dataavailable', (event) => {
+                if (event.data.size > 0 && socket?.readyState === 1) {
+                    socket.send(event.data);
+                }
+            });
+        };
+
+        socket.onmessage = (message) => {
+            const received = JSON.parse(message.data);
+            const transcript = received.channel.alternatives[0].transcript;
+            if (transcript) {
+                transcripts.value.push(transcript);
+            }
+        };
+
+        isRecording.value = true;
+    } catch (err) {
+        console.error('Error accessing microphone:', err);
+    }
 }
 
 function stopAudioTranscription() {
@@ -62,15 +54,20 @@ function stopAudioTranscription() {
     } else {
         console.log('No active audio transcription to stop.');
     }
+
+    if (socket) {
+        socket.close();
+    }
 }
+
 function handleAudioTranscription() {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
+    if (isRecording.value) {
         stopAudioTranscription();
     } else {
         startAudioTranscription();
     }
 }
-// Cleanup function to stop audio transcription when the component is unmounted
+
 onUnmounted(() => {
     stopAudioTranscription();
 });
@@ -89,11 +86,12 @@ onUnmounted(() => {
         <div class="py-12">
             <div class="mx-auto grid grid-flow-row grid-rows-2 gap-6">
                 <div>
-                    <p class="text-center">
-                        Lorem, ipsum dolor sit amet consectetur adipisicing
-                        elit. Id at commodi accusantium, consectetur nulla
-                        soluta, vero aspernatur quae debitis, minima modi ipsa
-                        iure! Facilis libero optio quidem, ab numquam impedit.
+                    <p
+                        class="text-center"
+                        v-for="(transcription, index) in transcripts"
+                        :key="index"
+                    >
+                        {{ transcription }}
                     </p>
                     <p class="text-center">
                         <audio
@@ -111,9 +109,28 @@ onUnmounted(() => {
                     </div>
                     <div class="mx-auto">
                         <Button @click="handleAudioTranscription">
-                            <Mic /> Start Listening
+                            <Mic />
+                            {{
+                                isRecording
+                                    ? 'Stop Listening'
+                                    : 'Start Listening'
+                            }}
                         </Button>
+                        <div v-if="isRecording" class="mt-2 text-red-500">
+                            Recording...
+                        </div>
                     </div>
+                </div>
+                <div>
+                    <h3>Transcripts:</h3>
+                    <ul>
+                        <li
+                            v-for="(transcript, index) in transcripts"
+                            :key="index"
+                        >
+                            {{ transcript }}
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
