@@ -89,10 +89,13 @@ onUnmounted(() => {
     stopAudioTranscription();
 });
 onMounted(() => {
-    window.Echo.channel('bible-verses').listen('EventName', (e: any) => {
-        // Handle the event
-        console.log(e);
-    });
+    window.Echo.channel('bible-verses').listen(
+        'BibleVerseRetrieved',
+        (e: any) => {
+            // Handle the event
+            console.log(e);
+        },
+    );
 });
 </script>
 
