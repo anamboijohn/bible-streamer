@@ -15,8 +15,8 @@ const combinedText = ref<string | null>(null);
 const GROQ_URL = 'wss://api.deepgram.com/v1/listen?language=en';
 const GROQ_KEY = '6dc15e174972ce916c930e5d4ec25006b249fc34';
 
-const lastFiveTranscriptions = computed(() => {
-    const start = Math.max(0, transcripts.value.length - 5);
+const lastTwoTranscriptions = computed(() => {
+    const start = Math.max(0, transcripts.value.length - 2);
     const text = transcripts.value.slice(start).join(' ');
     console.log(text);
     return text;
@@ -25,7 +25,7 @@ const lastFiveTranscriptions = computed(() => {
 async function sendTranscript() {
     try {
         let form = useForm({
-            text: lastFiveTranscriptions.value,
+            text: lastTwoTranscriptions.value,
         });
 
         form.post(route('transcribe.llm'));
