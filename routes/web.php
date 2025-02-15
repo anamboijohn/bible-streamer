@@ -26,7 +26,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::group(['prefix' => 'transcribe'], function () {
-    Route::post('/audio', [TranscribeController::class, 'show'])->name('transcribe.show');
     Route::post('/llm', [TranscribeController::class, 'handdleLLMQuery'])->name('transcribe.llm');
 });
 
