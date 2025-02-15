@@ -26,7 +26,6 @@ class TranscribeController extends Controller
             ->save(new \FFMpeg\Format\Audio\Mp3(), $mp3Path);
 
         $transcription = $this->transcribeAudio($mp3Path);
-        logger($transcription);
     }
 
     private function transcribeAudio($mp3Path)
@@ -79,7 +78,7 @@ class TranscribeController extends Controller
 
             // Convert to JSON and broadcast
             $verseJson = $versesResource->response()->getData(true);
-            broadcast(new BibleVerseRetrieved($verseJson));
+            BibleVerseRetrieved::dispatch($verseJson);
         } else {
             echo "Invalid query.";
         }
