@@ -32,7 +32,7 @@ class BibleVerseRetrieved implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('bible-verses'),
+            new Channel('bible-verses'),
         ];
     }
 }

@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Events\BibleVerseRetrieved;
 use App\Http\Requests\TranscribeRequest;
 use App\Http\Resources\BibleVerseResource;
+use App\Models\Nkjv;
 use FFMpeg\FFMpeg;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use LucianoTonet\GroqPHP\Groq;
 use Illuminate\Support\Str;
 
+class_alias(\App\Models\Nkjv::class, 'Nkjv');
 class TranscribeController extends Controller
 {
     public function show(TranscribeRequest $request)
@@ -78,7 +80,8 @@ class TranscribeController extends Controller
 
             // Convert to JSON and broadcast
             $verseJson = $versesResource->response()->getData(true);
-            BibleVerseRetrieved::dispatch($verseJson);
+            logger($verseJson);
+            broadcast(new BibleVerseRetrieved($verseJson));
         } else {
             echo "Invalid query.";
         }

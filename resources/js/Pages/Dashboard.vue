@@ -9,6 +9,8 @@ const isRecording = ref(false);
 const transcripts = ref<string[]>([]);
 let mediaRecorder: MediaRecorder | null = null;
 let socket: WebSocket | null = null;
+const reference = ref<string | null>(null);
+const combinedText = ref<string | null>(null);
 
 const GROQ_URL = 'wss://api.deepgram.com/v1/listen?language=en';
 const GROQ_KEY = '6dc15e174972ce916c930e5d4ec25006b249fc34';
@@ -94,6 +96,9 @@ onMounted(() => {
         (e: any) => {
             // Handle the event
             console.log(e);
+
+            reference.value = e.verseJson.data.reference;
+            combinedText.value = e.verseJson.data.combined_text;
         },
     );
 });
@@ -111,7 +116,11 @@ onMounted(() => {
 
         <div class="py-12">
             <div class="mx-auto grid grid-flow-row grid-rows-2 gap-6">
-                <div>
+                <div id="broadcast">
+                    <h3 class="text-center font-bold">{{ reference }}</h3>
+                    <p class="text-center">{{ combinedText }}</p>
+                </div>
+                <!-- <div>
                     <h3>Transcripts:</h3>
                     <ul>
                         <li
@@ -121,7 +130,7 @@ onMounted(() => {
                             {{ transcript }}
                         </li>
                     </ul>
-                </div>
+                </div> -->
 
                 <div
                     class="flex flex-col justify-between overflow-hidden bg-white py-10 shadow-sm sm:rounded-lg"
@@ -142,9 +151,6 @@ onMounted(() => {
                                     : 'Start Listening'
                             }}
                         </Button>
-                        <div v-if="isRecording" class="mt-2 text-red-500">
-                            Recording...
-                        </div>
                     </div>
                 </div>
             </div>
