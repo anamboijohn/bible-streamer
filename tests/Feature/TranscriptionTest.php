@@ -6,8 +6,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use function Pest\Laravel\postJson;
 
-uses(RefreshDatabase::class);
-
 // it('handles LLM query with valid text', function () {
 //     // Arrange
 //     Event::fake();
